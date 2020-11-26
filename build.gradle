@@ -1,0 +1,28 @@
+plugins {
+    id 'java'
+    id 'info.solidsoft.pitest' version '1.5.1'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation(platform('org.junit:junit-bom:5.7.0'))
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.assertj:assertj-core:3.11.1'
+}
+
+group = 'com.github.benajmineckstein.refactorkata'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '15'
+
+test {
+    useJUnitPlatform()
+}
+
+pitest {
+    testPlugin = "junit5"
+    junit5PluginVersion = '0.12'
+    mutators = ["ALL"]
+}
