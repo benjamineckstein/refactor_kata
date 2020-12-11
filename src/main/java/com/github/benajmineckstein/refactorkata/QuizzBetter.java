@@ -1,8 +1,23 @@
 package com.github.benajmineckstein.refactorkata;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.List;
 
+
+class Player{
+    private final String name;
+
+    private final int place;
+
+    public Player(String playerName) {
+        this.name = playerName;
+        place = 0;
+    }
+
+    public String getName() {
+        return name;
+    }
+}
 /**
  * Want to make this refactoring more interesting? Add one or more challenges:
  * 1. Speed Challenge: Do not use your mouse at all
@@ -13,25 +28,25 @@ import java.util.LinkedList;
  * 6. Bonus Challenge: Refactor in a way that you do not use a single if statement
  */
 public class QuizzBetter implements IQuizz {
-    ArrayList players = new ArrayList();
+    List<Player> players = new ArrayList<>();
     int[] places = new int[6];
     int[] purses = new int[6];
     boolean[] inPenaltyBox = new boolean[6];
 
-    LinkedList christmasQuestions = new LinkedList();
-    LinkedList newyearQuestions = new LinkedList();
-    LinkedList holidayQuestions = new LinkedList();
-    LinkedList winterMusicQuestions = new LinkedList();
+    List<String> christmasQuestions = new ArrayList<>();
+    List<String> newyearQuestions = new ArrayList<>();
+    List<String> holidayQuestions = new ArrayList<>();
+    List<String> winterMusicQuestions = new ArrayList<>();
 
     int currentPlayer = 0;
     boolean isGettingOutOfPenaltyBox;
 
     public QuizzBetter() {
         for (int i = 0; i < 50; i++) {
-            christmasQuestions.addLast("Christmas Question " + i);
-            newyearQuestions.addLast(("New Year Question " + i));
-            holidayQuestions.addLast(("Holiday Question " + i));
-            winterMusicQuestions.addLast(createWinterMusicQuestion(i));
+            christmasQuestions.add("Christmas Question " + i);
+            newyearQuestions.add(("New Year Question " + i));
+            holidayQuestions.add(("Holiday Question " + i));
+            winterMusicQuestions.add(createWinterMusicQuestion(i));
         }
     }
 
@@ -39,14 +54,9 @@ public class QuizzBetter implements IQuizz {
         return "Winter Music Question " + index;
     }
 
-    public boolean isPlayable() {
-        return (howManyPlayers() >= 2);
-    }
-
     public boolean add(String playerName) {
 
-
-        players.add(playerName);
+        players.add(new Player(playerName));
         places[howManyPlayers()] = 0;
         purses[howManyPlayers()] = 0;
         inPenaltyBox[howManyPlayers()] = false;
@@ -61,24 +71,24 @@ public class QuizzBetter implements IQuizz {
     }
 
     public void roll(int roll) {
-        System.out.println(players.get(currentPlayer) + " is the current player");
+        System.out.println(getCurrentPlayerName() + " is the current player");
         System.out.println("They have rolled a " + roll);
 
         if (inPenaltyBox[currentPlayer]) {
             if (roll % 2 != 0) {
                 isGettingOutOfPenaltyBox = true;
 
-                System.out.println(players.get(currentPlayer) + " is getting out of the penalty box");
+                System.out.println(getCurrentPlayerName() + " is getting out of the penalty box");
                 places[currentPlayer] = places[currentPlayer] + roll;
                 if (places[currentPlayer] > 11) places[currentPlayer] = places[currentPlayer] - 12;
 
-                System.out.println(players.get(currentPlayer)
+                System.out.println(getCurrentPlayerName()
                         + "'s new location is "
                         + places[currentPlayer]);
                 System.out.println("The category is " + currentCategory());
                 askQuestion();
             } else {
-                System.out.println(players.get(currentPlayer) + " is not getting out of the penalty box");
+                System.out.println(getCurrentPlayerName() + " is not getting out of the penalty box");
                 isGettingOutOfPenaltyBox = false;
             }
 
@@ -87,7 +97,7 @@ public class QuizzBetter implements IQuizz {
             places[currentPlayer] = places[currentPlayer] + roll;
             if (places[currentPlayer] > 11) places[currentPlayer] = places[currentPlayer] - 12;
 
-            System.out.println(players.get(currentPlayer)
+            System.out.println(getCurrentPlayerName()
                     + "'s new location is "
                     + places[currentPlayer]);
             System.out.println("The category is " + currentCategory());
@@ -97,14 +107,14 @@ public class QuizzBetter implements IQuizz {
     }
 
     private void askQuestion() {
-        if (currentCategory() == "Christmax")
-            System.out.println(christmasQuestions.removeFirst());
-        if (currentCategory() == "NewYear")
-            System.out.println(newyearQuestions.removeFirst());
-        if (currentCategory() == "Holiday")
-            System.out.println(holidayQuestions.removeFirst());
-        if (currentCategory() == "WinterMusic")
-            System.out.println(winterMusicQuestions.removeFirst());
+        if ("Christmax".equals(currentCategory()))
+            System.out.println(christmasQuestions.remove(0));
+        if ("NewYear".equals(currentCategory()))
+            System.out.println(newyearQuestions.remove(0));
+        if ("Holiday".equals(currentCategory()))
+            System.out.println(holidayQuestions.remove(0));
+        if ("WinterMusic".equals(currentCategory()))
+            System.out.println(winterMusicQuestions.remove(0));
     }
 
 
@@ -126,19 +136,19 @@ public class QuizzBetter implements IQuizz {
             if (isGettingOutOfPenaltyBox) {
                 System.out.println("Answer was correct!!!!");
                 purses[currentPlayer]++;
-                System.out.println(players.get(currentPlayer)
+                System.out.println(getCurrentPlayerName()
                         + " now has "
                         + purses[currentPlayer]
                         + " Gold Coins.");
 
                 boolean winner = didPlayerWin();
                 currentPlayer++;
-                if (currentPlayer == players.size()) currentPlayer = 0;
+                if (currentPlayer == howManyPlayers()) currentPlayer = 0;
 
                 return winner;
             } else {
                 currentPlayer++;
-                if (currentPlayer == players.size()) currentPlayer = 0;
+                if (currentPlayer == howManyPlayers()) currentPlayer = 0;
                 return true;
             }
 
@@ -147,14 +157,14 @@ public class QuizzBetter implements IQuizz {
 
             System.out.println("Answer was corrent!!!!");
             purses[currentPlayer]++;
-            System.out.println(players.get(currentPlayer)
+            System.out.println(getCurrentPlayerName()
                     + " now has "
                     + purses[currentPlayer]
                     + " Gold Coins.");
 
             boolean winner = didPlayerWin();
             currentPlayer++;
-            if (currentPlayer == players.size()) currentPlayer = 0;
+            if (currentPlayer == howManyPlayers()) currentPlayer = 0;
 
             return winner;
         }
@@ -162,12 +172,16 @@ public class QuizzBetter implements IQuizz {
 
     public boolean wrongAnswer() {
         System.out.println("Question was incorrectly answered");
-        System.out.println(players.get(currentPlayer) + " was sent to the penalty box");
+        System.out.println(getCurrentPlayerName() + " was sent to the penalty box");
         inPenaltyBox[currentPlayer] = true;
 
         currentPlayer++;
-        if (currentPlayer == players.size()) currentPlayer = 0;
+        if (currentPlayer == howManyPlayers()) currentPlayer = 0;
         return true;
+    }
+
+    private String getCurrentPlayerName() {
+        return players.get(currentPlayer).getName();
     }
 
 
