@@ -15,7 +15,7 @@ dependencies {
 
 group = 'com.github.benajmineckstein.refactorkata'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '15'
+sourceCompatibility = '12'
 
 test {
     useJUnitPlatform()
