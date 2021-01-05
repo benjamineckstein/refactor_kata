@@ -117,7 +117,7 @@ public class QuizzBetter implements IQuizz {
     }
 
     private void askQuestion() {
-        if ("Christmax".equals(currentCategory()))
+        if ("Christmas".equals(currentCategory()))
             System.out.println(christmasQuestions.remove(0));
         if ("NewYear".equals(currentCategory()))
             System.out.println(newyearQuestions.remove(0));
@@ -130,7 +130,7 @@ public class QuizzBetter implements IQuizz {
 
     private String currentCategory() {
         switch (getCurrentPlayer().getPlace() % 4) {
-            case 0: return "Christmax";
+            case 0: return "Christmas";
             case 1: return "NewYear";
             case 2: return "Holiday";
             default: return "WinterMusic";

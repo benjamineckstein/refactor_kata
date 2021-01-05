@@ -91,7 +91,7 @@ public class Quizz implements IQuizz {
    }
 
    private void askQuestion() {
-      if (currentCategory() == "Christmax")
+      if (currentCategory() == "Christmas")
          System.out.println(christmasQuestions.removeFirst());
       if (currentCategory() == "NewYear")
          System.out.println(newyearQuestions.removeFirst());
@@ -103,9 +103,9 @@ public class Quizz implements IQuizz {
 
 
    private String currentCategory() {
-      if (places[currentPlayer] == 0) return "Christmax";
-      if (places[currentPlayer] == 4) return "Christmax";
-      if (places[currentPlayer] == 8) return "Christmax";
+      if (places[currentPlayer] == 0) return "Christmas";
+      if (places[currentPlayer] == 4) return "Christmas";
+      if (places[currentPlayer] == 8) return "Christmas";
       if (places[currentPlayer] == 1) return "NewYear";
       if (places[currentPlayer] == 5) return "NewYear";
       if (places[currentPlayer] == 9) return "NewYear";
