@@ -161,7 +161,7 @@ public class QuizzBetter implements IQuizz {
 
         } else {
 
-            System.out.println("Answer was correctt!!!!");
+            System.out.println("Answer was correct!!!!");
             purses[currentPlayerPos]++;
             System.out.println(getCurrentPlayerName()
                     + " now has "

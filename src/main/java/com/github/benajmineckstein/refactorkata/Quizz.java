@@ -139,7 +139,7 @@ public class Quizz implements IQuizz {
 
       } else {
 
-         System.out.println("Answer was correctt!!!!");
+         System.out.println("Answer was correct!!!!");
          purses[currentPlayer]++;
          System.out.println(players.get(currentPlayer)
                             + " now has "
