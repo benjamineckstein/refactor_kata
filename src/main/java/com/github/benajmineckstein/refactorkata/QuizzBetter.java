@@ -9,9 +9,14 @@ class Player{
 
     private int place;
 
-    public Player(String playerName, int place) {
+    private int purse;
+
+    private boolean penaltyBox = false;
+
+    public Player(String playerName, int place, int purse) {
         this.name = playerName;
         this.place = place;
+        this.purse = purse;
     }
 
     public int move(int roll) {
@@ -20,12 +25,82 @@ class Player{
         return this.place;
     }
 
+    public boolean isPenaltyBox() {
+        return penaltyBox;
+    }
+
     public int getPlace() {
         return place;
     }
 
     public String getName() {
         return name;
+    }
+
+    public int getPurse() {
+        return purse;
+    }
+
+    public void incrPurse(){
+        this.purse += 1;
+    }
+
+    public void moveInPenaltyBox() {
+        this.penaltyBox = true;
+    }
+}
+
+class Players {
+
+    int currentPlayerPos = 0;
+    List<Player> players = new ArrayList<>();
+
+    public List<Player> getPlayers() {
+        return players;
+    }
+
+    public boolean add(String playerName) {
+        players.add(new Player(playerName, 0, 0));
+
+        System.out.println(playerName + " was added");
+        System.out.println("They are player number " + players.size());
+        return true;
+    }
+
+    public int getCurrentPlayerPos() {
+        return currentPlayerPos;
+    }
+
+    public int howManyPlayers() {
+        return players.size();
+    }
+
+    private void resetPlayerPos() {
+        this.currentPlayerPos = 0;
+    }
+
+
+    public String getCurrentPlayerName() {
+        return getCurrentPlayer().getName();
+    }
+
+    public Player getCurrentPlayer(){
+        return getPlayers().get(getCurrentPlayerPos());
+    }
+
+    public boolean didPlayerWin() {
+        return !(getCurrentPlayer().getPurse() == 6);
+    }
+
+    public void moveCurrentPlayer(int roll){
+        getCurrentPlayer().move(roll);
+    }
+
+    public void chooseNextPlayer() {
+        this.currentPlayerPos++;
+        if (getCurrentPlayerPos() == howManyPlayers()) {
+            resetPlayerPos();
+        }
     }
 }
 /**
@@ -38,16 +113,14 @@ class Player{
  * 6. Bonus Challenge: Refactor in a way that you do not use a single if statement
  */
 public class QuizzBetter implements IQuizz {
-    List<Player> players = new ArrayList<>();
-    int[] purses = new int[6];
-    boolean[] inPenaltyBox = new boolean[6];
+
+    Players players = new Players();
 
     List<String> christmasQuestions = new ArrayList<>();
     List<String> newyearQuestions = new ArrayList<>();
     List<String> holidayQuestions = new ArrayList<>();
     List<String> winterMusicQuestions = new ArrayList<>();
 
-    int currentPlayerPos = 0;
     boolean isGettingOutOfPenaltyBox;
 
     public QuizzBetter() {
@@ -64,56 +137,43 @@ public class QuizzBetter implements IQuizz {
     }
 
     public boolean add(String playerName) {
-
-        players.add(new Player(playerName, 0));
-        purses[howManyPlayers()] = 0;
-        inPenaltyBox[howManyPlayers()] = false;
-
-        System.out.println(playerName + " was added");
-        System.out.println("They are player number " + players.size());
-        return true;
-    }
-
-    public int howManyPlayers() {
-        return players.size();
+       return players.add(playerName);
     }
 
     public void roll(int roll) {
-        System.out.println(getCurrentPlayerName() + " is the current player");
+
+        System.out.println(players.getCurrentPlayerName() + " is the current player");
         System.out.println("They have rolled a " + roll);
 
-        if (inPenaltyBox[currentPlayerPos]) {
+        if (players.getCurrentPlayer().isPenaltyBox()) {
             if (roll % 2 != 0) {
                 isGettingOutOfPenaltyBox = true;
 
-                System.out.println(getCurrentPlayerName() + " is getting out of the penalty box");
-                movePlayer(roll);
+                System.out.println(players.getCurrentPlayerName() + " is getting out of the penalty box");
+                players.moveCurrentPlayer(roll);
 
-                System.out.println(getCurrentPlayerName()
+                System.out.println(players.getCurrentPlayerName()
                         + "'s new location is "
-                        + getCurrentPlayer().getPlace());
+                        + players.getCurrentPlayer().getPlace());
                 System.out.println("The category is " + currentCategory());
                 askQuestion();
             } else {
-                System.out.println(getCurrentPlayerName() + " is not getting out of the penalty box");
+
+                System.out.println(players.getCurrentPlayerName() + " is not getting out of the penalty box");
                 isGettingOutOfPenaltyBox = false;
             }
 
         } else {
 
-            movePlayer(roll);
+            players.moveCurrentPlayer(roll);
 
-            System.out.println(getCurrentPlayerName()
+            System.out.println(players.getCurrentPlayerName()
                     + "'s new location is "
-                    + getCurrentPlayer().getPlace());
+                    + players.getCurrentPlayer().getPlace());
             System.out.println("The category is " + currentCategory());
             askQuestion();
         }
 
-    }
-
-    private void movePlayer(int roll) {
-        getCurrentPlayer().move(roll);
     }
 
     private void askQuestion() {
@@ -129,7 +189,7 @@ public class QuizzBetter implements IQuizz {
 
 
     private String currentCategory() {
-        switch (getCurrentPlayer().getPlace() % 4) {
+        switch (players.getCurrentPlayer().getPlace() % 4) {
             case 0: return "Christmas";
             case 1: return "NewYear";
             case 2: return "Holiday";
@@ -138,23 +198,23 @@ public class QuizzBetter implements IQuizz {
     }
 
     public boolean wasCorrectlyAnswered() {
-        if (inPenaltyBox[currentPlayerPos]) {
+        if (players.getCurrentPlayer().isPenaltyBox()) {
             if (isGettingOutOfPenaltyBox) {
                 System.out.println("Answer was correct!!!!");
-                purses[currentPlayerPos]++;
-                System.out.println(getCurrentPlayerName()
+                players.getCurrentPlayer().incrPurse();
+
+                System.out.println(players.getCurrentPlayerName()
                         + " now has "
-                        + purses[currentPlayerPos]
+                        + players.getCurrentPlayer().getPurse()
                         + " Gold Coins.");
 
-                boolean winner = didPlayerWin();
-                currentPlayerPos++;
-                if (currentPlayerPos == howManyPlayers()) currentPlayerPos = 0;
+                boolean winner = players.didPlayerWin();
+                players.chooseNextPlayer();
 
                 return winner;
             } else {
-                currentPlayerPos++;
-                if (currentPlayerPos == howManyPlayers()) currentPlayerPos = 0;
+                players.chooseNextPlayer();
+
                 return true;
             }
 
@@ -162,15 +222,15 @@ public class QuizzBetter implements IQuizz {
         } else {
 
             System.out.println("Answer was correct!!!!");
-            purses[currentPlayerPos]++;
-            System.out.println(getCurrentPlayerName()
+            players.getCurrentPlayer().incrPurse();
+
+            System.out.println(players.getCurrentPlayerName()
                     + " now has "
-                    + purses[currentPlayerPos]
+                    + players.getCurrentPlayer().getPurse()
                     + " Gold Coins.");
 
-            boolean winner = didPlayerWin();
-            currentPlayerPos++;
-            if (currentPlayerPos == howManyPlayers()) currentPlayerPos = 0;
+            boolean winner = players.didPlayerWin();
+            players.chooseNextPlayer();
 
             return winner;
         }
@@ -178,23 +238,13 @@ public class QuizzBetter implements IQuizz {
 
     public boolean wrongAnswer() {
         System.out.println("Question was incorrectly answered");
-        System.out.println(getCurrentPlayerName() + " was sent to the penalty box");
-        inPenaltyBox[currentPlayerPos] = true;
 
-        currentPlayerPos++;
-        if (currentPlayerPos == howManyPlayers()) currentPlayerPos = 0;
+        System.out.println(players.getCurrentPlayerName() + " was sent to the penalty box");
+        players.getCurrentPlayer().moveInPenaltyBox();
+
+        players.chooseNextPlayer();
+
         return true;
     }
 
-    private String getCurrentPlayerName() {
-        return players.get(currentPlayerPos).getName();
-    }
-
-    private Player getCurrentPlayer() {
-        return players.get(currentPlayerPos);
-    }
-
-    private boolean didPlayerWin() {
-        return !(purses[currentPlayerPos] == 6);
-    }
 }
