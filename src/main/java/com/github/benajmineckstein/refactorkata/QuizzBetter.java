@@ -1,7 +1,9 @@
 package com.github.benajmineckstein.refactorkata;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 class Player {
@@ -104,11 +106,37 @@ class Players {
     }
 }
 
+class Questions {
+    private final Map<Category, List<String>> allQuestions = new HashMap<>();
+
+    public Questions() {
+        List<String> christmasQuestions = new ArrayList<>();
+        List<String> newyearQuestions = new ArrayList<>();
+        List<String> holidayQuestions = new ArrayList<>();
+        List<String> winterMusicQuestions = new ArrayList<>();
+        for (int i = 0; i < 50; i++) {
+            christmasQuestions.add("Christmas Question " + i);
+            newyearQuestions.add("New Year Question " + i);
+            holidayQuestions.add("Holiday Question " + i);
+            winterMusicQuestions.add("Winter Music Question " + i);
+        }
+        allQuestions.put(Category.CHRISTMAS, christmasQuestions);
+        allQuestions.put(Category.NEWYEAR, newyearQuestions);
+        allQuestions.put(Category.HOLIDAY, holidayQuestions);
+        allQuestions.put(Category.WINTERMUSIC, winterMusicQuestions);
+    }
+
+    public String nextQuestionForCategory(Category category) {
+        return allQuestions.get(category).remove(0);
+    }
+}
+
 enum Category {
     CHRISTMAS("Christmas"),
     NEWYEAR("NewYear"),
     HOLIDAY("Holiday"),
-    WINTERMUSIC("WinterMusic");
+    WINTERMUSIC("WinterMusic"),
+    ;
 
     private final String displayName;
 
@@ -120,15 +148,14 @@ enum Category {
         return displayName;
     }
 
-    public static Category fromPlayerPlace(int place) {
-        return switch (place % 4) {
+    public static Category fromPlayer(Player player) {
+        return switch (player.getPlace() % 4) {
             case 0 -> CHRISTMAS;
             case 1 -> NEWYEAR;
             case 2 -> HOLIDAY;
             case 3 -> WINTERMUSIC;
             default -> throw new RuntimeException("Invalid place");
         };
-
     }
 }
 
@@ -144,22 +171,9 @@ enum Category {
 public class QuizzBetter implements IQuizz {
 
     Players players = new Players();
-
-    List<String> christmasQuestions = new ArrayList<>();
-    List<String> newyearQuestions = new ArrayList<>();
-    List<String> holidayQuestions = new ArrayList<>();
-    List<String> winterMusicQuestions = new ArrayList<>();
+    Questions questions = new Questions();
 
     boolean isGettingOutOfPenaltyBox;
-
-    public QuizzBetter() {
-        for (int i = 0; i < 50; i++) {
-            christmasQuestions.add("Christmas Question " + i);
-            newyearQuestions.add(("New Year Question " + i));
-            holidayQuestions.add(("Holiday Question " + i));
-            winterMusicQuestions.add("Winter Music Question " + i);
-        }
-    }
 
     public boolean add(String playerName) {
         return players.add(playerName);
@@ -202,18 +216,12 @@ public class QuizzBetter implements IQuizz {
     }
 
     private void askQuestion() {
-        List<String> questions = switch (currentCategory()) {
-            case CHRISTMAS -> christmasQuestions;
-            case NEWYEAR -> newyearQuestions;
-            case HOLIDAY -> holidayQuestions;
-            case WINTERMUSIC -> winterMusicQuestions;
-        };
-        System.out.println(questions.remove(0));
+        System.out.println(this.questions.nextQuestionForCategory(currentCategory()));
     }
 
 
     private Category currentCategory() {
-        return Category.fromPlayerPlace(players.getCurrentPlayer().getPlace());
+        return Category.fromPlayer(players.getCurrentPlayer());
     }
 
     public boolean wasCorrectlyAnswered() {
