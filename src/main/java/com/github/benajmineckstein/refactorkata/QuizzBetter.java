@@ -112,7 +112,7 @@ enum Category {
 
     private final String displayName;
 
-    Category(String displayName){
+    Category(String displayName) {
         this.displayName = displayName;
     }
 
@@ -202,16 +202,13 @@ public class QuizzBetter implements IQuizz {
     }
 
     private void askQuestion() {
-
-
-        if (Category.CHRISTMAS == currentCategory())
-            System.out.println(christmasQuestions.remove(0));
-        if (Category.NEWYEAR == currentCategory())
-            System.out.println(newyearQuestions.remove(0));
-        if (Category.HOLIDAY == currentCategory())
-            System.out.println(holidayQuestions.remove(0));
-        if (Category.WINTERMUSIC == currentCategory())
-            System.out.println(winterMusicQuestions.remove(0));
+        List<String> questions = switch (currentCategory()) {
+            case CHRISTMAS -> christmasQuestions;
+            case NEWYEAR -> newyearQuestions;
+            case HOLIDAY -> holidayQuestions;
+            case WINTERMUSIC -> winterMusicQuestions;
+        };
+        System.out.println(questions.remove(0));
     }
 
 
