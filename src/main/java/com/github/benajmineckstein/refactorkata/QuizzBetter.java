@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-class Player{
+class Player {
     private final String name;
 
     private int place;
@@ -41,7 +41,7 @@ class Player{
         return purse;
     }
 
-    public void incrPurse(){
+    public void incrPurse() {
         this.purse += 1;
     }
 
@@ -84,7 +84,7 @@ class Players {
         return getCurrentPlayer().getName();
     }
 
-    public Player getCurrentPlayer(){
+    public Player getCurrentPlayer() {
         return getPlayers().get(getCurrentPlayerPos());
     }
 
@@ -92,7 +92,7 @@ class Players {
         return !(getCurrentPlayer().getPurse() == 6);
     }
 
-    public void moveCurrentPlayer(int roll){
+    public void moveCurrentPlayer(int roll) {
         getCurrentPlayer().move(roll);
     }
 
@@ -103,6 +103,35 @@ class Players {
         }
     }
 }
+
+enum Category {
+    CHRISTMAS("Christmas"),
+    NEWYEAR("NewYear"),
+    HOLIDAY("Holiday"),
+    WINTERMUSIC("WinterMusic");
+
+    private final String displayName;
+
+    Category(String displayName){
+        this.displayName = displayName;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public static Category fromPlayerPlace(int place) {
+        return switch (place % 4) {
+            case 0 -> CHRISTMAS;
+            case 1 -> NEWYEAR;
+            case 2 -> HOLIDAY;
+            case 3 -> WINTERMUSIC;
+            default -> throw new RuntimeException("Invalid place");
+        };
+
+    }
+}
+
 /**
  * Want to make this refactoring more interesting? Add one or more challenges:
  * 1. Speed Challenge: Do not use your mouse at all
@@ -128,16 +157,12 @@ public class QuizzBetter implements IQuizz {
             christmasQuestions.add("Christmas Question " + i);
             newyearQuestions.add(("New Year Question " + i));
             holidayQuestions.add(("Holiday Question " + i));
-            winterMusicQuestions.add(createWinterMusicQuestion(i));
+            winterMusicQuestions.add("Winter Music Question " + i);
         }
     }
 
-    public String createWinterMusicQuestion(int index) {
-        return "Winter Music Question " + index;
-    }
-
     public boolean add(String playerName) {
-       return players.add(playerName);
+        return players.add(playerName);
     }
 
     public void roll(int roll) {
@@ -155,7 +180,7 @@ public class QuizzBetter implements IQuizz {
                 System.out.println(players.getCurrentPlayerName()
                         + "'s new location is "
                         + players.getCurrentPlayer().getPlace());
-                System.out.println("The category is " + currentCategory());
+                System.out.println("The category is " + currentCategory().getDisplayName());
                 askQuestion();
             } else {
 
@@ -170,31 +195,28 @@ public class QuizzBetter implements IQuizz {
             System.out.println(players.getCurrentPlayerName()
                     + "'s new location is "
                     + players.getCurrentPlayer().getPlace());
-            System.out.println("The category is " + currentCategory());
+            System.out.println("The category is " + currentCategory().getDisplayName());
             askQuestion();
         }
 
     }
 
     private void askQuestion() {
-        if ("Christmas".equals(currentCategory()))
+
+
+        if (Category.CHRISTMAS == currentCategory())
             System.out.println(christmasQuestions.remove(0));
-        if ("NewYear".equals(currentCategory()))
+        if (Category.NEWYEAR == currentCategory())
             System.out.println(newyearQuestions.remove(0));
-        if ("Holiday".equals(currentCategory()))
+        if (Category.HOLIDAY == currentCategory())
             System.out.println(holidayQuestions.remove(0));
-        if ("WinterMusic".equals(currentCategory()))
+        if (Category.WINTERMUSIC == currentCategory())
             System.out.println(winterMusicQuestions.remove(0));
     }
 
 
-    private String currentCategory() {
-        switch (players.getCurrentPlayer().getPlace() % 4) {
-            case 0: return "Christmas";
-            case 1: return "NewYear";
-            case 2: return "Holiday";
-            default: return "WinterMusic";
-        }
+    private Category currentCategory() {
+        return Category.fromPlayerPlace(players.getCurrentPlayer().getPlace());
     }
 
     public boolean wasCorrectlyAnswered() {
